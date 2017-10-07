@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Adyant's CRUD Application</title>
+<style>
+body {
+	background-color: #F6F6F6;
+}
+
+#listtable {
+	padding-left: 100px;
+	padding-right: 100px;
+}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous">
+
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+	crossorigin="anonymous"></script>
+</head>
+<body>
+	<input type="hidden" id="hdn_cur_page" value="1">
+	<input type="hidden" id="hdn_max_pages" value="0">
+	<table id="logtbl" class="table table-responsive">
+		<thead class="thead-default">
+			<tr>
+				<th class="centered">Line #</th>
+				<th class="centered">Log Text</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	<div class="row">
+		<div class="col-xs-4"></div>
+		<button type="button" class="col-xs-2 btn btn-secondary" id="prvPage">Previous</button>
+		<button type="button" class=" col-xs-2 btn btn-secondary" id="nxtPage">Next</button>
+		<div class="col-xs-4"></div>
+	</div>
+	<a href="/"> HomePage</a>
+	<script type="text/javascript">
+	var max_pages = parseInt($('#hdn_max_pages').val());
+	$(document).ready(function(){
+		$.ajax({
+			type : "GET",
+			url : "api/getLogsCount",
+			success : function(data) {
+				max_pages = data.max_pages;
+				$('#hdn_max_pages').val(max_pages.toString());
+			},
+		});
+		function callListAjaxCommand(method, urlStr, page) {
+			$.ajax({
+				type : method, 
+				url : urlStr + "/" + page,
+				success : function(data) {
+					var page = parseInt($("#hdn_cur_page").val());
+					max_pages = parseInt($('#hdn_max_pages').val());
+					if (page >= max_pages) {
+						$("#nxtPage").css("display", "none");
+
+					} else {
+						$("#nxtPage").css("display", "block");
+					}
+					if (page <= 1) {
+						$("#prvPage").css("display", "none");
+
+					} else {
+						$("#prvPage").css("display", "block");
+					}
+					$('#logtbl tbody').empty();
+					var jsondata = data['log_list'];
+					$('#logtbl').append(
+						    $.map(jsondata, function (ignore, index) {
+						        return '<tr><td>' + jsondata[index][0] + '</td><td>' + jsondata[index][1] + '</td></tr>';
+						    }).join()
+						);
+				},
+			});
+		}
+		var page = $("#hdn_cur_page").val();
+
+		callListAjaxCommand("GET","api/listLogs", page)
+		if (page >= max_pages) {
+			$("#nxtPage").css("display", "none");
+		} else {
+			$("#nxtPage").css("display", "block");
+		}
+		if (page <= 1) {
+			$("#prvPage").css("display", "none");
+		} else {
+			$("#prvPage").css("display", "block");
+		}
+		
+		$("#nxtPage").click(function(event) {
+			var page = parseInt($("#hdn_cur_page").val());
+			max_pages = parseInt($('#hdn_max_pages').val());
+			if (page < max_pages) {
+				page = page + 1;
+				callListAjaxCommand("GET","api/listLogs", page)
+				$("#hdn_cur_page").val(page.toString());
+			}
+		});
+
+		$("#prvPage").click(function(event) {
+			var page = parseInt($("#hdn_cur_page").val());
+			max_pages = parseInt($('#hdn_max_pages').val());
+			if (page > 0) {
+				page = page - 1;
+				callListAjaxCommand("GET","api/listLogs", page)
+				$("#hdn_cur_page").val(page.toString());
+			}
+
+		});
+	});
+</script>
+</body>
+</html>

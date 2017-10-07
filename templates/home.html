@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Adyant's CRUD Application</title>
+<style>
+body {
+    background-color: #F6F6F6;
+}
+
+#listtable {
+    padding-left: 100px;
+    padding-right: 100px;
+}
+
+#reqreswrapper {
+    width: 70%;
+}
+
+.centered {
+    text-align: center;
+}
+
+.verbs {
+    display: none;
+    text-align:center;
+}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<link
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous">
+    
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <input type="hidden" id="hdn_btnType" value="">
+    <input type="hidden" id="hdn_cur_page" value="1">
+	<input type="hidden" id="hdn_max_pages" value="0">
+    <div class="centered">
+        <div>
+            <h2>Simple CRUD Application</h2>
+        </div>
+        <div>
+            <h3>List of Users</h3>
+        </div>
+        <div id="listtable">
+            <table id="usertbl" class="table table-responsive">
+                <thead class="thead-default">
+                    <tr>
+                        <th class="centered">Id</th>
+                        <th class="centered">UserName</th>
+                        <th class="centered">First Name</th>
+                        <th class="centered">Last Name</th>
+                        <th class="centered">Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+		<div class="row">
+			<div class="col-xs-4"></div>
+			<button type="button" class="col-xs-2 btn btn-secondary" id="prvPage">Previous</button>
+			<button type="button" class="col-xs-2 btn btn-secondary" id="nxtPage">Next</button>
+			<div class="col-xs-4"></div>
+		</div>
+		<br/><br/>
+        <div style="margin-bottom:25px;" class=" btn-group btn-group-lg" role="group" aria-label="CRUD">
+            <button type="button" class="btn btn-primary" id="getbtn">GET</button>
+            <button type="button" class="btn btn-primary" id="postbtn">POST</button>
+            <button type="button" class="btn btn-primary" id="putbtn">PUT</button>
+            <button type="button" class="btn btn-primary" id="delbtn">DELETE</button>
+        </div>
+        <br />
+
+        <div class="row" id="reqreswrapper">
+            <div class="row col-sm-6 rounded border-dark" id="request">
+                <div style="margin-bottom:5px;" class="col-sm-12">
+                	<button class="btn btn-outline-primary" type="submit" id="submit">Submit</button>
+                </div>
+                <div class="verbs col-sm-12" id="getform">
+                    <input type="text" name="id" placeholder="ID" class="input-sm" id="getId"> <br />
+                </div>
+                <div class="verbs col-sm-12" id="postform">
+                    <input type="text" placeholder="Username" name="uname" class="input" id="postUser"> <br /> 
+                    <input type="text" placeholder="First Name" name="fname" class="input-sm" id="postFnm"> <br />
+                    <input type="text" placeholder="Last Name" name="lname" class="input-sm" id="postLnm"> <br /> 
+                    <input type="text" placeholder="Email" name="email" class="input-sm" id="postEm"> <br />
+                </div> 
+                <div class="verbs col-sm-12" id="putform">
+                    <input type="text" placeholder="ID" name="id" class="input-sm"i d="putId"> <br />
+                    <input type="text" placeholder="Username" name="uname" class="input-sm" id="putUser"><br /> 
+                    <input type="text" placeholder="First Name" name="fname" class="input-sm" id="putFnm"><br /> 
+                    <input type="text" placeholder="Last Name" name="lname" class="input-sm" id="putLnm"><br />
+                    <input type="text" placeholder="Email" name="email" class="input-sm" id="putEm"><br />
+                </div>
+                <div class="verbs col-sm-12" id="delform">
+                    <input type="text" placeholder="ID" name="id" class="input-sm" id="delId"><br />
+                    <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title" id="myModalLabel">Delete User?</h4>
+                                </div>
+                                <div class="modal-body">Are you sure you wish to Delete?</div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id="confirmDel">Delete User</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 rounded border-dark" id="response"></div>
+            <br />
+
+        </div>
+        <a href="viewLogs"> View Logs</a>
+    </div>
+    <script type="text/javascript">
+	var max_pages = parseInt($('#hdn_max_pages').val());
+	var page = $("#hdn_cur_page").val();
+	$(document).ready(function(){
+
+	function callUserCountAjaxCommand(){
+		$.ajax({
+			type : "GET",
+			url : "api/getUsersCount",
+			success : function(data) {
+				max_pages = data.max_pages;
+				$('#hdn_max_pages').val(max_pages.toString());
+        		page = $("#hdn_cur_page").val();
+        		callListAjaxCommand("GET","api/listUsers", page);
+			},
+		});
+	}
+	
+	callUserCountAjaxCommand();
+	
+		function callListAjaxCommand(method, urlStr, page) {
+			$.ajax({
+				type : method, 
+				url : urlStr + "/" + page,
+				success : function(data) {
+					page = parseInt($("#hdn_cur_page").val());
+					max_pages = parseInt($('#hdn_max_pages').val());
+					if (page >= max_pages) {
+						$("#nxtPage").css("display", "none");
+
+					} else {
+						$("#nxtPage").css("display", "block");
+					}
+					if (page <= 1) {
+						$("#prvPage").css("display", "none");
+
+					} else {
+						$("#prvPage").css("display", "block");
+					}
+					$('#usertbl tbody').empty();
+					$('#usertbl').append(
+						    $.map(data, function (ignore, index) {
+						        return '<tr><td>' + data[index].id + '</td><td>' + data[index].username + '</td><td>' + data[index].first_name + '</td><td>' + data[index].last_name + '</td><td>' + data[index].email + '</td></tr>';
+						    }).join()
+						);
+				},
+			});
+		}
+
+		if (page >= max_pages) {
+			$("#nxtPage").css("display", "none");
+
+		} else {
+			$("#nxtPage").css("display", "block");
+		}
+		if (page <= 1) {
+			$("#prvPage").css("display", "none");
+
+		} else {
+			$("#prvPage").css("display", "block");
+		}
+			
+		$("#nxtPage").click(function(event) {
+			page = parseInt($("#hdn_cur_page").val());
+			max_pages = parseInt($('#hdn_max_pages').val());
+			if (page < max_pages) {
+				page = page + 1;
+				callListAjaxCommand("GET","api/listUsers", page)
+				$("#hdn_cur_page").val(page.toString());
+			}
+		});
+
+		$("#prvPage").click(function(event) {
+			page = parseInt($("#hdn_cur_page").val());
+			max_pages = parseInt($('#hdn_max_pages').val());
+			if (page > 0) {
+				page = page - 1;
+				callListAjaxCommand("GET","api/listUsers", page)
+				$("#hdn_cur_page").val(page.toString());
+			}
+		});
+		
+        $("#getbtn").click(function(event) {
+            $("#hdn_btnType").val("R");
+            $(".verbs").css("display", "none");
+            $("#getform").css("display", "block");
+            $(".btn").removeClass("active");
+            $(this).addClass("active");
+            
+        });
+        $("#postbtn").click(function(event) {
+            $("#hdn_btnType").val("C");
+            $(".verbs").css("display", "none");
+            $("#postform").css("display", "block");
+            $(".btn").removeClass("active");
+            $(this).addClass("active");
+
+        });
+        $("#putbtn").click(function(event) {
+            $("#hdn_btnType").val("U");
+            $(".verbs").css("display", "none");
+            $("#putform").css("display", "block");
+            $(".btn").removeClass("active");
+            $(this).addClass("active");
+
+        });
+        $("#delbtn").click(function(event) {
+            $("#hdn_btnType").val("D");
+            $(".verbs").css("display", "none");
+            $("#delform").css("display", "block");
+            $(".btn").removeClass("active");
+            $(this).addClass("active");
+
+        });
+
+        $("#submit").on('click',
+                function(event) {
+                    var btnType = $("#hdn_btnType").val();
+                    
+                    if (btnType == "R") {
+                        var getId = $("#getId").val();
+                        var urlStr = "api/getUser/" + getId;
+                        $.ajax({
+                            type : "GET",
+                            url : urlStr,
+                            success : function(data) {
+                                $("#response").html("<span class='text-success'>" + JSON.stringify(data) + "</span>");
+                            },
+                            error : function(data) {
+                            	$("#response").html("<span class='text-danger'>" + JSON.stringify(data) + "</span>"); // provide a bit more info about the error to the console
+                            },
+                        });
+                    } else if (btnType == "C") {
+                        //var id = $("#getid").val();
+                        var user = $("#postUser").val();
+                        var fName = $("#postFnm").val();
+                        var lName = $("#postLnm").val();
+                        var email = $("#postEm").val();
+                        var urlStr = "api/createUser";
+                        $.ajax({
+                            type : "POST",
+                            url : urlStr,
+                            data : {
+                                'uname' : user,
+                                'fname' : fName,
+                                'lname' : lName,
+                                'email' : email,
+                                csrfmiddlewaretoken : '{{ csrf_token }}'
+                            },
+                            success : function(data) {
+                            	callUserCountAjaxCommand();
+                                $("#response").html("<span class='text-success'>" + JSON.stringify(data) + "</span>");
+                            },
+                            error : function(data) {
+                            	$("#response").html("<span class='text-danger'>" + JSON.stringify(data) + "</span>"); // provide a bit more info about the error to the console
+                            },
+                        });
+                    } else if (btnType == "U") {
+                        var putId = $("#putId").val();
+                        var user = $("#putUser").val();
+                        var fName = $("#putFnm").val();
+                        var lName = $("#putLnm").val();
+                        var email = $("#putEm").val();
+                        var urlStr = "api/updateUser";
+                        $.ajax({
+                            type : "PUT",
+                            url : urlStr,
+                            data : {
+                                'id' : putId,
+                                'uname' : user,
+                                'fname' : fName,
+                                'lname' : lName,
+                                'email' : email,
+                                csrfmiddlewaretoken : '{{ csrf_token }}'
+                            },
+                            success : function(data) {
+                        		var page = $("#hdn_cur_page").val();
+                        		callListAjaxCommand("GET","api/listUsers", page);
+                                $("#response").html("<span class='text-success'>" + JSON.stringify(data) + "</span>");
+                            },
+                            error : function(data) {
+                            	$("#response").html("<span class='text-danger'>" + JSON.stringify(data) + "</span>"); // provide a bit more info about the error to the console
+                            },
+                        });
+                    } else if (btnType == "D") {
+                        $('#myModal').modal({show: true});
+                        var delId = $("#delId").val();
+                        var urlStr = "api/deleteUser/" + delId;
+    					$("#confirmDel").click(function(event){
+                        	$.ajax({
+    	                        type : "DELETE",
+        	                    url : urlStr,
+            	                data : {
+                	                'id' : putId,
+                    	            'uname' : user,
+                        	        'fname' : fName,
+                            	    'lname' : lName,
+                                	'email' : email,
+    	                            csrfmiddlewaretoken : '{{ csrf_token }}'
+        	                    },
+            	                success : function(data) {
+            	                	callUserCountAjaxCommand();
+                                    $('#myModal').modal({show: false});
+                	                $("#response").html("<span class='text-success'>" + JSON.stringify(data) + "</span>");
+                	                $("#hdn_btnType").val("");
+                        	    },
+                            	error : function(data) {
+                                    $('#myModal').modal({show: false});
+                                	$("#response").html("<span class='text-danger'>" + JSON.stringify(data) + "</span>"); // provide a bit more info about the error to the console
+                                	$("#hdn_btnType").val("");
+                            	},
+    	                    });
+    					});                        
+
+                    }
+
+                    
+                    
+                });		
+		
+	});
+    
+    </script>
+
+
+</body>
+</html>
