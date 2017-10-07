@@ -18,17 +18,6 @@ import math, logging, os
 rlogger = logging.getLogger(__name__)
 
 
-class ListLogs(generic.ListView):
-    template_name = 'logs.html'
-    context_object_name = 'users'
-    paginate_by = 3
-    paginate_by_param = 2
-    max_paginate_by = 10
-    def get_queryset(self):
-        users = User.objects.all()
-        return users
-
-
 class ListUserApi(generics.ListAPIView):
     serializer_class = UserSerializer
     template_name = 'home.html'

@@ -85,23 +85,23 @@ body {
                 	<button class="btn btn-outline-primary" type="submit" id="submit">Submit</button>
                 </div>
                 <div class="verbs col-sm-12" id="getform">
-                    <input type="text" name="id" placeholder="ID" class="input-sm" id="getId"> <br />
+                    <input type="text" name="id" placeholder="ID" id="getId"> <br />
                 </div>
                 <div class="verbs col-sm-12" id="postform">
-                    <input type="text" placeholder="Username" name="uname" class="input" id="postUser"> <br /> 
-                    <input type="text" placeholder="First Name" name="fname" class="input-sm" id="postFnm"> <br />
-                    <input type="text" placeholder="Last Name" name="lname" class="input-sm" id="postLnm"> <br /> 
-                    <input type="text" placeholder="Email" name="email" class="input-sm" id="postEm"> <br />
+                    <input type="text" placeholder="Username" name="uname" id="postUser"> <br /> 
+                    <input type="text" placeholder="First Name" name="fname" id="postFnm"> <br />
+                    <input type="text" placeholder="Last Name" name="lname" id="postLnm"> <br /> 
+                    <input type="text" placeholder="Email" name="email"  id="postEm"> <br />
                 </div> 
                 <div class="verbs col-sm-12" id="putform">
-                    <input type="text" placeholder="ID" name="id" class="input-sm"i d="putId"> <br />
-                    <input type="text" placeholder="Username" name="uname" class="input-sm" id="putUser"><br /> 
-                    <input type="text" placeholder="First Name" name="fname" class="input-sm" id="putFnm"><br /> 
-                    <input type="text" placeholder="Last Name" name="lname" class="input-sm" id="putLnm"><br />
-                    <input type="text" placeholder="Email" name="email" class="input-sm" id="putEm"><br />
+                    <input type="text" placeholder="ID" name="id" id="putId"> <br />
+                    <input type="text" placeholder="Username" name="uname" id="putUser"><br /> 
+                    <input type="text" placeholder="First Name" name="fname" id="putFnm"><br /> 
+                    <input type="text" placeholder="Last Name" name="lname" id="putLnm"><br />
+                    <input type="text" placeholder="Email" name="email" id="putEm"><br />
                 </div>
                 <div class="verbs col-sm-12" id="delform">
-                    <input type="text" placeholder="ID" name="id" class="input-sm" id="delId"><br />
+                    <input type="text" placeholder="ID" name="id" id="delId"><br />
                     <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
@@ -312,7 +312,7 @@ body {
                             },
                         });
                     } else if (btnType == "D") {
-                        $('#myModal').modal({show: true});
+                        $('#myModal').modal("toggle");
                         var delId = $("#delId").val();
                         var urlStr = "api/deleteUser/" + delId;
     					$("#confirmDel").click(function(event){
@@ -329,12 +329,12 @@ body {
         	                    },
             	                success : function(data) {
             	                	callUserCountAjaxCommand();
-                                    $('#myModal').modal({show: false});
+                                    $('#myModal').modal("toggle");
                 	                $("#response").html("<span class='text-success'>" + JSON.stringify(data) + "</span>");
                 	                $("#hdn_btnType").val("");
                         	    },
                             	error : function(data) {
-                                    $('#myModal').modal({show: false});
+                                    $('#myModal').modal("toggle");
                                 	$("#response").html("<span class='text-danger'>" + JSON.stringify(data) + "</span>"); // provide a bit more info about the error to the console
                                 	$("#hdn_btnType").val("");
                             	},

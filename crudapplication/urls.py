@@ -30,8 +30,8 @@ urlpatterns = [
     url(r'^api/deleteUser/(?P<pk>[0-9]+)$', Deleteview.as_view()),
     url(r'^api/listUsers/(?P<page>[0-9]+)$', UserListview.as_view()),
     url(r'^api/getUsersCount', GetUsersCount.as_view()),
-    url(r'^api/listLogs/(?P<page>[0-9]+)$', LogListview.as_view()),
-    url(r'^api/getLogsCount', GetLogsCount.as_view()),
+    url(r'^listLogs/(?P<page>[0-9]+)$', LogListview.as_view()),
+    url(r'^getLogsCount', GetLogsCount.as_view()),
     url(r'^viewLogs', TemplateView.as_view(template_name = "logs.html")),
 ]
 

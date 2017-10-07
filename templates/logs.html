@@ -52,7 +52,7 @@ body {
 	$(document).ready(function(){
 		$.ajax({
 			type : "GET",
-			url : "api/getLogsCount",
+			url : "getLogsCount",
 			success : function(data) {
 				max_pages = data.max_pages;
 				$('#hdn_max_pages').val(max_pages.toString());
@@ -89,7 +89,7 @@ body {
 		}
 		var page = $("#hdn_cur_page").val();
 
-		callListAjaxCommand("GET","api/listLogs", page)
+		callListAjaxCommand("GET","listLogs", page)
 		if (page >= max_pages) {
 			$("#nxtPage").css("display", "none");
 		} else {
@@ -106,7 +106,7 @@ body {
 			max_pages = parseInt($('#hdn_max_pages').val());
 			if (page < max_pages) {
 				page = page + 1;
-				callListAjaxCommand("GET","api/listLogs", page)
+				callListAjaxCommand("GET","listLogs", page)
 				$("#hdn_cur_page").val(page.toString());
 			}
 		});
@@ -116,7 +116,7 @@ body {
 			max_pages = parseInt($('#hdn_max_pages').val());
 			if (page > 0) {
 				page = page - 1;
-				callListAjaxCommand("GET","api/listLogs", page)
+				callListAjaxCommand("GET","listLogs", page)
 				$("#hdn_cur_page").val(page.toString());
 			}
 
