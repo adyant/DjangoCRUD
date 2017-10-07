@@ -1,0 +1,3 @@
+1)Logfile paging is also done using AJAX
+2)Log Middleware (LogCapture) done using process_request instead of process_response because directions implied to only capture request not response(no status_code)
+
